@@ -1,0 +1,5 @@
+name: ExampleBot
+version: 0.1.0
+api-version: 0.37.3
+authors: ["SNWCreations"]
+main: com.kook.Main
