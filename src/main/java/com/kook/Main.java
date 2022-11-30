@@ -55,6 +55,23 @@ public class Main extends BasePlugin {
                         }
                 )
                 .register();
+
+
+        new JKookCommand("赵腾鹏")
+                .executesUser(
+                        (sender, args, message) -> {
+                            if (sender instanceof User) { // 确保是个 Kook 用户在执行此命令
+                                reply(sender, message, "笨逼！");
+                            } else {
+                                getLogger().info("This command is not available for console.");
+                                // 这个 else 块是可选的，但为了用户体验，最好还是提醒一下
+                                // 另外，我们假设此执行器是在 Bot#onEnable 里写的，所以我们可以使用 getLogger() 。
+                            }
+                        }
+                )
+                .register();
+
+
         getLogger().info("PingBot 启动成功！");
     }
 
