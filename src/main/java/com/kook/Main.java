@@ -77,15 +77,19 @@ public class Main extends BasePlugin {
 
 
     private void reply(User sender, Message message, String content) {
-        if (message instanceof TextChannelMessage) {
+        /*if (message instanceof TextChannelMessage) {
             ((TextChannelMessage) message).getChannel().sendComponent(
                     new MarkdownComponent(content),
-                    null, //(TextChannelMessage) message,
-                    sender
+                    (TextChannelMessage) message,null
             );
         } else {
             sender.sendPrivateMessage(new MarkdownComponent(content));
-        }
+        }*/
+
+        ((TextChannelMessage) message).getChannel().sendComponent(
+                new MarkdownComponent(content),
+                (TextChannelMessage) message,null//传入参数表示仅本人可见
+        );
     }
 
     private void reply(User sender, Message message, BaseComponent component) {
