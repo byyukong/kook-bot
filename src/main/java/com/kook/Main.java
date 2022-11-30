@@ -4,9 +4,11 @@ package com.kook;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.pojo.weather.ResultsVo;
-import okhttp3.*;
+import okhttp3.Call;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import snw.jkook.command.JKookCommand;
 import snw.jkook.entity.User;
 import snw.jkook.message.Message;
@@ -33,19 +35,7 @@ public class Main extends BasePlugin {
                 .executesUser(
                         (sender, args, message) -> {
                             if (sender instanceof User) { // 确保是个 Kook 用户在执行此命令
-                                OkHttpClient client = new OkHttpClient();
-                                Request request = new Request.Builder().url("https://v1.hitokoto.cn/").get().build();
-                                Call call=client.newCall(request);
-                                Map<String,Object> map = new HashMap();
-                                try {
-                                    Response response =call.execute();
-                                    map = JSON.parseObject(response.body().string());
-                                    response.close();
-
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-
+                                Map<String,Object> map = OkHttpClientUtil.get("https://v1.hitokoto.cn/");
                                 reply(sender, message, map.get("hitokoto").toString());
                             } else {
                                 getLogger().info("This command is not available for console.");
@@ -60,8 +50,15 @@ public class Main extends BasePlugin {
         new JKookCommand("赵腾鹏")
                 .executesUser(
                         (sender, args, message) -> {
-                            if (sender instanceof User) { // 确保是个 Kook 用户在执行此命令
-                                reply(sender, message, "笨逼！");
+                            if (sender instanceof User) {
+                                MultipleCardComponent card = new CardBuilder()
+                                        .setTheme(Theme.NONE)
+                                        .setSize(Size.LG)
+                                        .addModule(
+                                                new HeaderModule(new PlainTextElement("笨逼！", false))
+                                        )
+                                        .build();
+                                reply(sender, message, card);
                             } else {
                                 getLogger().info("This command is not available for console.");
                                 // 这个 else 块是可选的，但为了用户体验，最好还是提醒一下
@@ -77,26 +74,65 @@ public class Main extends BasePlugin {
                         (sender, args, message) -> {
                             if (sender instanceof User) {
                                 if (args.length == 1){
-                                    OkHttpClient client = new OkHttpClient();
-                                    Request request = new Request.Builder().url("https://api.seniverse.com/v3/weather/now.json?key=SCYrvkytJze9qyzOh&location=" + args[0] + "&language=zh-Hans&unit=c").get().build();
-                                    Call call = client.newCall(request);
-                                    Map<String,Object> map = new HashMap<>();
-                                    try {
-                                        Response response = call.execute();
-                                        map = JSON.parseObject(response.body().string());
-                                        response.close();
+                                    Map<String,Object> map = OkHttpClientUtil.get(
+                                            "https://api.seniverse.com/v3/weather/now.json" +
+                                                    "?key=SCYrvkytJze9qyzOh&location=" + args[0] + "&language=zh-Hans&unit=c"
+                                    );
 
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
+                                    if (map.containsKey("status_code")){
+                                        reply(sender, message, "查询不到城市！");
+                                    }else {
+                                        JSONArray results1 = JSON.parseArray(map.get("results").toString());
+
+                                        ResultsVo resultsVo = JSON.parseObject(results1.get(0).toString(), ResultsVo.class);
+
+                                        MultipleCardComponent card = new CardBuilder()
+                                                .setTheme(Theme.NONE)
+                                                .setSize(Size.LG)
+                                                .addModule(
+                                                        new ContextModule.Builder()
+                                                                .add(new PlainTextElement("城市：" + resultsVo
+                                                                        .getLocation().getName() + "\n" + "天气：" +
+                                                                        resultsVo.getNow()
+                                                                        .getText() + "\n" + "温度：" + resultsVo.getNow()
+                                                                        .getTemperature(), false)).build()
+                                                )
+                                                .build();
+
+                                        reply(sender, message, card);
+
                                     }
-                                    JSONArray results1 = JSON.parseArray(map.get("results").toString());
 
-                                    ResultsVo resultsVo = JSON.parseObject(results1.get(0).toString(), ResultsVo.class);
-
-                                    reply(sender, message, "城市：" + resultsVo.getLocation().getName() + "\n" + "天气：" + resultsVo.getNow().getText() + "\n" + "温度：" + resultsVo.getNow().getTemperature());
 
                                 }else {
                                     reply(sender, message, "请输入需要查询的城市，/weather 城市");
+                                }
+
+                            } else {
+                                getLogger().info("This command is not available for console.");
+                            }
+                        }
+                )
+                .register();
+
+        new JKookCommand("舔狗")
+                .executesUser(
+                        (sender, args, message) -> {
+                            if (sender instanceof User) {
+                                String res = OkHttpClientUtil.getString("http://api.gt5.cc/api/dog");
+
+                                if (null != res) {
+                                    MultipleCardComponent card = new CardBuilder()
+                                            .setTheme(Theme.NONE)
+                                            .setSize(Size.LG)
+                                            .addModule(
+                                                    new ContextModule.Builder()
+                                                    .add(new PlainTextElement(res, false)).build()
+                                            )
+                                            .build();
+                                    reply(sender, message, card);
+                                } else {
+                                    reply(sender, message, "请求错误！");
                                 }
 
                             } else {
@@ -122,14 +158,13 @@ public class Main extends BasePlugin {
         if (message instanceof TextChannelMessage) {
             ((TextChannelMessage) message).getChannel().sendComponent(
                     component,
-                    null,
-                    sender
+                    null, //(TextChannelMessage) message,
+                    null
             );
         } else {
             sender.sendPrivateMessage(component);
         }
     }
-
 
 
 
