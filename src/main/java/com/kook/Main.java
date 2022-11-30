@@ -9,14 +9,27 @@ import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import snw.jkook.JKook;
 import snw.jkook.command.JKookCommand;
 import snw.jkook.entity.User;
+import snw.jkook.entity.abilities.Accessory;
 import snw.jkook.message.Message;
 import snw.jkook.message.TextChannelMessage;
 import snw.jkook.message.component.BaseComponent;
 import snw.jkook.message.component.MarkdownComponent;
+import snw.jkook.message.component.card.CardBuilder;
+import snw.jkook.message.component.card.MultipleCardComponent;
+import snw.jkook.message.component.card.Size;
+import snw.jkook.message.component.card.Theme;
+import snw.jkook.message.component.card.element.ImageElement;
+import snw.jkook.message.component.card.element.MarkdownElement;
+import snw.jkook.message.component.card.element.PlainTextElement;
+import snw.jkook.message.component.card.module.ContextModule;
+import snw.jkook.message.component.card.module.HeaderModule;
+import snw.jkook.message.component.card.module.SectionModule;
 import snw.jkook.plugin.BasePlugin;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,8 +60,15 @@ public class Main extends BasePlugin {
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
+                                MultipleCardComponent card = new CardBuilder()
+                                        .setTheme(Theme.NONE)
+                                        .setSize(Size.LG)
+                                        .addModule(
+                                                new HeaderModule(new PlainTextElement(map.get("hitokoto").toString(), false))
+                                        )
+                                        .build();
 
-                                reply(sender, message, map.get("hitokoto").toString());
+                                reply(sender, message, card);
                             } else {
                                 getLogger().info("This command is not available for console.");
                                 // 这个 else 块是可选的，但为了用户体验，最好还是提醒一下
@@ -62,12 +82,17 @@ public class Main extends BasePlugin {
         new JKookCommand("赵腾鹏")
                 .executesUser(
                         (sender, args, message) -> {
-                            if (sender instanceof User) { // 确保是个 Kook 用户在执行此命令
-                                reply(sender, message, "笨逼！");
+                            if (sender instanceof User) {
+                                MultipleCardComponent card = new CardBuilder()
+                                        .setTheme(Theme.NONE)
+                                        .setSize(Size.LG)
+                                        .addModule(
+                                                new HeaderModule(new PlainTextElement("笨逼！", false))
+                                        )
+                                        .build();
+                                reply(sender, message, card);
                             } else {
                                 getLogger().info("This command is not available for console.");
-                                // 这个 else 块是可选的，但为了用户体验，最好还是提醒一下
-                                // 另外，我们假设此执行器是在 Bot#onEnable 里写的，所以我们可以使用 getLogger() 。
                             }
                         }
                 )
@@ -91,11 +116,27 @@ public class Main extends BasePlugin {
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
-                                    JSONArray results1 = JSON.parseArray(map.get("results").toString());
 
-                                    ResultsVo resultsVo = JSON.parseObject(results1.get(0).toString(), ResultsVo.class);
+                                    if (map.containsKey("status_code")){
+                                        reply(sender, message, "查询不到城市！");
+                                    }else {
+                                        JSONArray results1 = JSON.parseArray(map.get("results").toString());
 
-                                    reply(sender, message, "城市：" + resultsVo.getLocation().getName() + "\n" + "天气：" + resultsVo.getNow().getText() + "\n" + "温度：" + resultsVo.getNow().getTemperature());
+                                        ResultsVo resultsVo = JSON.parseObject(results1.get(0).toString(), ResultsVo.class);
+
+
+                                        MultipleCardComponent card = new CardBuilder()
+                                                .setTheme(Theme.NONE)
+                                                .setSize(Size.LG)
+                                                .addModule(
+                                                        new HeaderModule(new PlainTextElement("城市：" + resultsVo.getLocation().getName() + "\n" + "天气：" + resultsVo.getNow().getText() + "\n" + "温度：" + resultsVo.getNow().getTemperature(), false))
+                                                )
+                                                .build();
+
+                                        reply(sender, message, card);
+
+                                    }
+
 
                                 }else {
                                     reply(sender, message, "请输入需要查询的城市，/weather 城市");
@@ -134,7 +175,7 @@ public class Main extends BasePlugin {
             ((TextChannelMessage) message).getChannel().sendComponent(
                     component,
                     null, //(TextChannelMessage) message,
-                    sender
+                    null
             );
         } else {
             sender.sendPrivateMessage(component);

@@ -15,7 +15,7 @@ import java.util.Map;
 public class Test {
     public static void main(String[] args) {
         OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder().url("https://api.seniverse.com/v3/weather/now.json?key=SCYrvkytJze9qyzOh&location=%E5%8E%A6%E9%97%A8&language=zh-Hans&unit=c").get().build();
+        Request request = new Request.Builder().url("https://api.seniverse.com/v3/weather/now.json?key=SCYrvkytJze9qyzOh&location=厦门1&language=zh-Hans&unit=c").get().build();
         Call call = client.newCall(request);
         Map<String,Object> map = new HashMap<>();
         try {
@@ -24,7 +24,9 @@ public class Test {
             response.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
+        }
+        if (map.containsKey("status_code")){
+            System.err.println("查询不到城市！");
         }
         JSONArray results1 = JSON.parseArray(map.get("results").toString());
 
