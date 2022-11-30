@@ -4,11 +4,9 @@ package com.kook;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.pojo.weather.ResultsVo;
-import okhttp3.Call;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 import snw.jkook.command.JKookCommand;
 import snw.jkook.entity.User;
 import snw.jkook.message.Message;
@@ -114,18 +112,9 @@ public class Main extends BasePlugin {
 
 
     private void reply(User sender, Message message, String content) {
-        /*if (message instanceof TextChannelMessage) {
-            ((TextChannelMessage) message).getChannel().sendComponent(
-                    new MarkdownComponent(content),
-                    (TextChannelMessage) message,null
-            );
-        } else {
-            sender.sendPrivateMessage(new MarkdownComponent(content));
-        }*/
-
         ((TextChannelMessage) message).getChannel().sendComponent(
                 new MarkdownComponent(content),
-                (TextChannelMessage) message,null//传入参数表示仅本人可见
+                (TextChannelMessage) message,null
         );
     }
 
@@ -133,13 +122,14 @@ public class Main extends BasePlugin {
         if (message instanceof TextChannelMessage) {
             ((TextChannelMessage) message).getChannel().sendComponent(
                     component,
-                    null, //(TextChannelMessage) message,
+                    null,
                     sender
             );
         } else {
             sender.sendPrivateMessage(component);
         }
     }
+
 
 
 
