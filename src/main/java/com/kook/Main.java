@@ -50,15 +50,7 @@ public class Main extends BasePlugin {
                         (sender, args, message) -> {
                             if (sender instanceof User) { // 确保是个 Kook 用户在执行此命令
                                 Map<String,Object> map = OkHttpClientUtil.get("https://v1.hitokoto.cn/");
-                                MultipleCardComponent card = new CardBuilder()
-                                        .setTheme(Theme.NONE)
-                                        .setSize(Size.LG)
-                                        .addModule(
-                                                new HeaderModule(new PlainTextElement(map.get("hitokoto").toString(), false))
-                                        )
-                                        .build();
-
-                                reply(sender, message, card);
+                                reply(sender, message, map.get("hitokoto").toString());
                             } else {
                                 getLogger().info("This command is not available for console.");
                                 // 这个 else 块是可选的，但为了用户体验，最好还是提醒一下
@@ -106,15 +98,16 @@ public class Main extends BasePlugin {
 
                                         ResultsVo resultsVo = JSON.parseObject(results1.get(0).toString(), ResultsVo.class);
 
-
                                         MultipleCardComponent card = new CardBuilder()
                                                 .setTheme(Theme.NONE)
                                                 .setSize(Size.LG)
                                                 .addModule(
-                                                        new HeaderModule(new PlainTextElement("城市：" + resultsVo
-                                                                .getLocation().getName() + "\n" + "天气：" + resultsVo.getNow()
-                                                                .getText() + "\n" + "温度：" + resultsVo.getNow().getTemperature(),
-                                                                false))
+                                                        new ContextModule.Builder()
+                                                                .add(new PlainTextElement("城市：" + resultsVo
+                                                                        .getLocation().getName() + "\n" + "天气：" +
+                                                                        resultsVo.getNow()
+                                                                        .getText() + "\n" + "温度：" + resultsVo.getNow()
+                                                                        .getTemperature(), false)).build()
                                                 )
                                                 .build();
 
