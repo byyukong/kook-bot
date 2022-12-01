@@ -145,6 +145,34 @@ public class Main extends BasePlugin {
                 .register();
 
 
+            new JKookCommand("社会")
+                    .executesUser(
+                            (sender, args, message) -> {
+                                if (sender instanceof User) {
+                                    String res = OkHttpClientUtil.getString("https://api.oick.cn/yulu/api.php");
+
+                                    if (null != res) {
+                                        MultipleCardComponent card = new CardBuilder()
+                                                .setTheme(Theme.NONE)
+                                                .setSize(Size.LG)
+                                                .addModule(
+                                                        new ContextModule.Builder()
+                                                                .add(new PlainTextElement(res.substring(1,res.length() -1), false)).build()
+                                                )
+                                                .build();
+                                        reply(sender, message, card);
+                                    } else {
+                                        reply(sender, message, "请求错误！");
+                                    }
+
+                                } else {
+                                    getLogger().info("This command is not available for console.");
+                                }
+                            }
+                    )
+                    .register();
+
+
         getLogger().info("PingBot 启动成功！");
     }
 
