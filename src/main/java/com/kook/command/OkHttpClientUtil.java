@@ -1,4 +1,4 @@
-package com.util;
+package com.kook.command;
 
 
 import com.alibaba.fastjson.JSON;

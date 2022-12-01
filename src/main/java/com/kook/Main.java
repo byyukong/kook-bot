@@ -5,11 +5,7 @@ package com.kook;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.pojo.weather.ResultsVo;
-import com.util.OkHttpClientUtil;
-import okhttp3.Call;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import com.kook.command.OkHttpClientUtil;
 import snw.jkook.command.JKookCommand;
 import snw.jkook.entity.User;
 import snw.jkook.message.Message;
@@ -25,8 +21,6 @@ import snw.jkook.message.component.card.module.ContextModule;
 import snw.jkook.message.component.card.module.HeaderModule;
 import snw.jkook.plugin.BasePlugin;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 public class Main extends BasePlugin {
