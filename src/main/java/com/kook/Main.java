@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.pojo.weather.ResultsVo;
 import com.kook.command.OkHttpClientUtil;
 import snw.jkook.command.JKookCommand;
+import snw.jkook.command.UserCommandExecutor;
 import snw.jkook.entity.User;
 import snw.jkook.message.Message;
 import snw.jkook.message.TextChannelMessage;
@@ -21,6 +22,7 @@ import snw.jkook.message.component.card.module.ContextModule;
 import snw.jkook.message.component.card.module.HeaderModule;
 import snw.jkook.plugin.BasePlugin;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Main extends BasePlugin {
@@ -173,6 +175,47 @@ public class Main extends BasePlugin {
                     .register();
 
 
+        /*new JKookCommand("翻译")
+                .executesUser(
+                        (sender, args, message) -> {
+                            if (sender instanceof User) {
+                                if (args.length == 1) {
+                                    Map<String,Object> res = new HashMap<>();
+                                    try {
+                                        String url = "https://api.vvhan.com/api/fy?text=" + args[0];
+                                        getLogger().error(url);
+                                        res = OkHttpClientUtil.get(url);
+                                    } catch (Exception e){
+
+                                        reply(sender, message, "请求错误！");
+                                    }
+                                    if (null != res) {
+                                        Map<String,Object> data = JSON.parseObject(res.get("data").toString(), Map.class);
+                                        MultipleCardComponent card = new CardBuilder()
+                                                .setTheme(Theme.NONE)
+                                                .setSize(Size.LG)
+                                                .addModule(
+                                                        new ContextModule.Builder()
+                                                                .add(new PlainTextElement("翻译结果：" + data.get("fanyi").toString(), false)).build()
+                                                )
+                                                .build();
+                                        reply(sender, message, card);
+                                    } else {
+                                        reply(sender, message, "请求错误！");
+                                    }
+                                }else {
+                                    reply(sender, message, "请输入需要翻译的内容，格式 /翻译 内容！");
+                                }
+
+
+                            } else {
+                                getLogger().info("This command is not available for console.");
+                            }
+                        }
+                )
+                .register();*/
+
+
         getLogger().info("PingBot 启动成功！");
     }
 
@@ -195,7 +238,6 @@ public class Main extends BasePlugin {
             sender.sendPrivateMessage(component);
         }
     }
-
 
 
     @Override
