@@ -2,8 +2,8 @@ package com.kook.util;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.kook.pojo.music.BizContent;
-import com.kook.pojo.music.CommonParameters;
+/*import com.kook.pojo.music.BizContent;
+import com.kook.pojo.music.CommonParameters;*/
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import snw.jkook.command.JKookCommand;
@@ -51,10 +51,10 @@ public class MusicCommand {
 
 
 
-    /**
+/*    *//**
      * 网易云音乐搜索
      * @return
-     */
+     *//*
     public JSONObject musicBasicSearch(String keyword){
         BizContent con=new BizContent();
         con.setKeyword(keyword);
@@ -68,7 +68,7 @@ public class MusicCommand {
         RequestBody body = new FormBody.Builder().add("bizContent",bizContent.toString()).build();
         final JSONObject jsonObject = requestPostTools(WYYHTTPHEAD + url,body);
         return jsonObject;
-    }
+    }*/
 
 
 

@@ -5,11 +5,13 @@ import com.alibaba.fastjson.JSON;
 import com.kook.mapper.SteamApiMapper;
 import com.kook.util.MybatisUtils;
 import com.kook.util.OkHttpClientUtil;
+import com.kook.util.PictureUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +36,20 @@ public class TestApi {
         } else {
             log.error("请求错误！");
         }
+    }
+
+    @Test
+    public void testApi() {
+        Map<String,Object> res = new HashMap<>();
+        try {
+            res = OkHttpClientUtil.get("https://api.vvhan.com/api/moyu?type=json");
+            File file = PictureUtils.UrlToFile(res.get("url").toString());
+            System.out.println(file);
+        }catch (Exception e){
+            log.error("请求错误！");
+        }
+        
+        
     }
 
 
