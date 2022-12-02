@@ -316,7 +316,7 @@ public class Main extends BasePlugin {
 
 
 
-        textCommand.sendText("今天吃什么",chiShenMe());
+        textCommand.sendText("今天吃什么",textCommand.chiShenMe());
 
         getLogger().info("PingBot 启动成功！");
     }
@@ -341,26 +341,7 @@ public class Main extends BasePlugin {
         }
     }
 
-    public String chiShenMe(){
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .addHeader("X-APISpace-Token","f2d1h2f6hhoo5ll3eop5e1vc69ekozuh")
-                .addHeader("Authorization-Type","apikey")
-                .url("https://eolink.o.apispace.com/eat222/api/v1/forward/chishenme?size=1").get().build();
-        Call call=client.newCall(request);
-        JSONObject jsonObject = null;
-        try {
-            Response response =call.execute();
-            jsonObject = JSON.parseObject(response.body().string());
-            response.close();
 
-        } catch (
-                IOException e) {
-            e.printStackTrace();
-        }
-        assert jsonObject != null;
-        return jsonObject.getJSONArray("data").get(0).toString();
-    }
 
     @Override
     public void onDisable() {

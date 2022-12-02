@@ -1,5 +1,11 @@
 package com.kook.command;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import okhttp3.Call;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import snw.jkook.command.JKookCommand;
 import snw.jkook.entity.User;
 import snw.jkook.message.Message;
@@ -12,6 +18,8 @@ import snw.jkook.message.component.card.Theme;
 import snw.jkook.message.component.card.element.PlainTextElement;
 import snw.jkook.message.component.card.module.HeaderModule;
 import snw.jkook.plugin.BasePlugin;
+
+import java.io.IOException;
 
 /**
  * @author hy
@@ -46,6 +54,31 @@ public class TextCommand extends BasePlugin {
                         }
                 )
                 .register();
+    }
+
+
+    public String chiShenMe(){
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .addHeader("X-APISpace-Token","f2d1h2f6hhoo5ll3eop5e1vc69ekozuh")
+                .addHeader("Authorization-Type","apikey")
+                .url("https://eolink.o.apispace.com/eat222/api/v1/forward/chishenme?size=1").get().build();
+        Call call=client.newCall(request);
+        JSONObject jsonObject = null;
+        try {
+            Response response =call.execute();
+            jsonObject = JSON.parseObject(response.body().string());
+            response.close();
+
+        } catch (
+                IOException e) {
+            e.printStackTrace();
+        }
+        assert jsonObject != null;
+        if (jsonObject.get("code")!="200"){
+            return "异常了";
+        }
+        return jsonObject.getJSONArray("data").get(0).toString();
     }
 
     private void reply(User sender, Message message, BaseComponent component) {
