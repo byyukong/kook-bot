@@ -17,7 +17,6 @@ public class PictureUtils {
             if (file.exists()) {
                 file.delete();//如果缓存中存在该文件就删除
             }
-            OutputStream os = new FileOutputStream(file);
             return file;
     }
 }
