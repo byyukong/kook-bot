@@ -3,7 +3,8 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kook.mapper.SteamApiMapper">
-    <select id="queryRole" resultType="map">
-        SELECT role_code,role_name FROM sys_role
+
+    <select id="getApiInfoById" resultType="com.kook.pojo.Api">
+        SELECT APP_KEY,API_URL FROM API WHERE ID = #{id}
     </select>
 </mapper>

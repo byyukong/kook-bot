@@ -9,6 +9,7 @@ import com.kook.util.PictureUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
+import sun.dc.pr.PRError;
 
 import javax.annotation.Resource;
 import java.io.File;
@@ -19,6 +20,7 @@ import java.util.Map;
 public class TestApi {
     SqlSession sqlSession = MybatisUtils.getSqlSession();
 
+    private SteamApiMapper steamApiMapper = sqlSession.getMapper(SteamApiMapper.class);
 
     @Test
     public void testTranslationApi() {
@@ -54,16 +56,16 @@ public class TestApi {
 
 
     @Test
-    public void sqlTest(){
-        //获得SqlSession对象
+    public void steamBdTest(){
         try {
-            SteamApiMapper mapper = sqlSession.getMapper(SteamApiMapper.class);
-            System.out.println(mapper.queryRole());
+            System.out.println(steamApiMapper.getApiInfoById("9e04d6e3e8db4efa914e60fb94d80114"));
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             sqlSession.close();
         }
     }
+
+
 
 }

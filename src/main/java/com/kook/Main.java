@@ -205,7 +205,37 @@ public class Main extends BasePlugin {
                     .register();
 
 
-        new JKookCommand("翻译")
+
+        new JKookCommand("/steambd")
+                .executesUser(
+                        (sender, args, message) -> {
+                            if (sender instanceof User) {
+                                String res = OkHttpClientUtil.getString("https://api.oick.cn/yulu/api.php");
+
+
+                                if (null != res) {
+                                    MultipleCardComponent card = new CardBuilder()
+                                            .setTheme(Theme.NONE)
+                                            .setSize(Size.LG)
+                                            .addModule(
+                                                    new ContextModule.Builder()
+                                                            .add(new PlainTextElement(res.substring(1,res.length() -1), false)).build()
+                                            )
+                                            .build();
+                                    reply(sender, message, card);
+                                } else {
+                                    reply(sender, message, "请求错误！");
+                                }
+
+                            } else {
+                                getLogger().info("This command is not available for console.");
+                            }
+                        }
+                )
+                .register();
+
+
+        /*new JKookCommand("翻译")
                 .executesUser(
                         (sender, args, message) -> {
                             if (sender instanceof User) {
@@ -213,7 +243,7 @@ public class Main extends BasePlugin {
                                     Map<String,Object> res = new HashMap<>();
                                     try {
                                         String url = "https://api.vvhan.com/api/fy?text=" + args[0];
-                                        getLogger().error(url);
+                                        getLogger().info(url);
                                         res = OkHttpClientUtil.get(url);
                                     } catch (Exception e){
 
@@ -243,7 +273,7 @@ public class Main extends BasePlugin {
                             }
                         }
                 )
-                .register();
+                .register();*/
 
         new JKookCommand("摸鱼")
                 .executesUser(
