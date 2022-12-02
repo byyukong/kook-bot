@@ -2,10 +2,8 @@ package com.kook.command;
 
 
 import com.alibaba.fastjson.JSON;
-import okhttp3.Call;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import com.alibaba.fastjson.JSONObject;
+import okhttp3.*;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -45,6 +43,42 @@ public class OkHttpClientUtil {
         }
 
         return res;
+    }
+
+    //get
+    public JSONObject requestGetTools(String url){
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).get().build();
+        Call call=client.newCall(request);
+        JSONObject jsonObject = null;
+        try {
+            Response response =call.execute();
+            jsonObject = JSON.parseObject(response.body().string());
+            response.close();
+
+        } catch (
+                IOException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+    //post
+    public JSONObject requestPostTools(String url, RequestBody body){
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).post(body).build();
+        Call call=client.newCall(request);
+        JSONObject jsonObject = null;
+        try {
+            Response response =call.execute();
+            jsonObject = JSON.parseObject(response.body().string());
+            response.close();
+
+        } catch (
+                IOException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
     }
 
 }
