@@ -7,6 +7,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.kook.command.TextCommand;
 import com.kook.mapper.SteamApiMapper;
+import com.kook.pojo.Api;
+import com.kook.pojo.SteamKook;
+import com.kook.pojo.steam.SteamGamesVo;
+import com.kook.pojo.steam.SteamResponseVo;
 import com.kook.pojo.weather.ResultsVo;
 import com.kook.util.MybatisUtils;
 import com.kook.util.OkHttpClientUtil;
@@ -39,6 +43,7 @@ import snw.jkook.plugin.BasePlugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -176,7 +181,7 @@ public class Main extends BasePlugin {
                                             .setSize(Size.LG)
                                             .addModule(
                                                     new ContextModule.Builder()
-                                                    .add(new PlainTextElement(res, false)).build()
+                                                            .add(new PlainTextElement(res, false)).build()
                                             )
                                             .build();
                                     reply(sender, message, card);
@@ -226,32 +231,22 @@ public class Main extends BasePlugin {
                 .executesUser(
                         (sender, args, message) -> {
                             if (sender instanceof User) {
-                                try {
-                                    if (args.length != 1) {
-                                        if (steamApiMapper.getSteamBdInfoByKookId(sender.getId()) > 0) {
+                                if (args.length == 1) {
+                                    if (args[0].length() == 17) {
+                                        if (steamApiMapper.getSteamBdCountByKookId(sender.getId()) > 0) {
                                             reply(sender, message, "已经绑定过了！");
                                         } else {
                                             steamApiMapper.addSteamBd(UUID.randomUUID().toString().replace("-",""),sender.getId(),args[0]);
+                                            reply(sender, message, "绑定Steam成功！");
                                             sqlSession.commit();
                                         }
                                     }else {
-                                        reply(sender, message, "请输入SteamId，格式 /steambd xxx！");
+                                        reply(sender, message, "SteamID格式不正确！");
                                     }
 
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                } finally {
-                                    sqlSession.close();
+                                }else {
+                                    reply(sender, message, "请输入SteamID，格式 /steambd 17位SeamID！");
                                 }
-                                MultipleCardComponent card = new CardBuilder()
-                                        .setTheme(Theme.NONE)
-                                        .setSize(Size.LG)
-                                        .addModule(
-                                                new ContextModule.Builder()
-                                                        .add(new PlainTextElement("", false)).build()
-                                        )
-                                        .build();
-                                reply(sender, message, card);
 
                             } else {
                                 getLogger().info("This command is not available for console.");
@@ -259,6 +254,60 @@ public class Main extends BasePlugin {
                         }
                 )
                 .register();
+
+
+        new JKookCommand("steaminfo")
+                .executesUser(
+                        (sender, args, message) -> {
+                            if (sender instanceof User) {
+                                SteamKook steamInfo = steamApiMapper.getSteamBdInfoByKookId(sender.getId());
+                                getLogger().info("用户ID" + sender.getId());
+                                getLogger().info(JSON.toJSONString(steamInfo));
+                                if (null != steamInfo){
+                                    Api apiInfoById = steamApiMapper.getApiInfoById("9e04d6e3e8db4efa914e60fb94d80114");
+                                    String url = apiInfoById.getApiUrl() + "?key=" + apiInfoById.getAppKey() + "&steamid=" + steamInfo.getSteamId();
+                                    Map<String, Object> res = OkHttpClientUtil.get(url);
+
+                                    SteamResponseVo steamResponseVo = JSON.parseObject(res.get("response").toString(), SteamResponseVo.class);
+                                    getLogger().info("最近游玩游戏数：" + steamResponseVo.getTotalCount());
+
+
+                                    steamResponseVo.getGames().forEach(item -> {
+                                        Double playtime2weeks = Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytime2weeks()) / 60));
+
+                                        MultipleCardComponent card = new CardBuilder()
+                                                .setTheme(Theme.NONE)
+                                                .setSize(Size.LG)
+                                                .addModule(
+                                                        new ContextModule.Builder()
+                                                                .add(new PlainTextElement(
+                                                                        "游戏名：" + item.getName() + "\n" +
+                                                                                "最近两周游戏时间：" + playtime2weeks + "\n" +
+                                                                                "Windows游戏时间：" + Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytimeWindowsForever()) / 60)) + "\n" +
+                                                                                "MAC游戏时间：" + Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytimeMacForever()) / 60)) + "\n" +
+                                                                                "Linux游戏时间：" + Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytimeLinuxForever()) / 60)) + "\n"
+                                                                        , false)).build()
+                                                )
+                                                .build();
+
+                                        reply(sender, message, card);
+                                    });
+
+
+
+
+
+                                }else {
+                                    reply(sender, message, "请先绑定Steam！");
+                                }
+                            } else {
+                                getLogger().info("This command is not available for console.");
+                            }
+                        }
+                )
+                .register();
+
+
 
 
         /*new JKookCommand("翻译")

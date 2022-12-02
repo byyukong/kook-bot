@@ -5,11 +5,11 @@
 <mapper namespace="com.kook.mapper.SteamApiMapper">
 
     <select id="getApiInfoById" resultType="com.kook.pojo.Api">
-        SELECT APP_KEY,API_URL FROM API WHERE ID = #{id}
+        SELECT APP_KEY,API_URL FROM API WHERE ID = #{id}  AND IS_DELETED = 0
     </select>
 
 
-    <select id="getSteamBdInfoByKookId" resultType="int">
+    <select id="getSteamBdCountByKookId" resultType="int">
         SELECT COUNT(1) FROM STEAM_KOOK WHERE KOOK_ID = #{kookId} AND IS_DELETED = 0
     </select>
 
@@ -17,4 +17,8 @@
         insert into steam_kook (id,kook_id,steam_id,is_deleted) values
         (#{id},#{kookId},#{steamId},0)
     </insert>
+
+    <select id="getSteamBdInfoByKookId" resultType="com.kook.pojo.SteamKook">
+        SELECT STEAM_ID FROM STEAM_KOOK WHERE KOOK_ID = #{kookId} AND IS_DELETED = 0
+    </select>
 </mapper>
