@@ -75,8 +75,8 @@ public class TextCommand extends BasePlugin {
             e.printStackTrace();
         }
         assert jsonObject != null;
-        if (jsonObject.get("code")!="200"){
-            return "异常了";
+        if (!"200".equals(jsonObject.get("code"))){
+            return "异常了"+jsonObject.get("code");
         }
         return jsonObject.getJSONArray("data").get(0).toString();
     }
