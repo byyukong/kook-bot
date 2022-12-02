@@ -59,8 +59,8 @@ public class TestApi {
     public void steamBdTest(){
         try {
 //            System.out.println(steamApiMapper.getApiInfoById("9e04d6e3e8db4efa914e60fb94d80114"));
-//            System.out.println(steamApiMapper.getSteamBdInfoByKookId("1"));
-            System.out.println(steamApiMapper.addSteamBd("2","2","2"));
+            System.out.println(steamApiMapper.getSteamBdInfoByKookId("1"));
+//            System.out.println(steamApiMapper.addSteamBd("2","2","2"));
             sqlSession.commit();
         } catch (Exception e) {
             e.printStackTrace();

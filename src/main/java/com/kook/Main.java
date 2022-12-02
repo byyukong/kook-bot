@@ -222,7 +222,7 @@ public class Main extends BasePlugin {
 
 
 
-        new JKookCommand("/steambd")
+        new JKookCommand("steambd")
                 .executesUser(
                         (sender, args, message) -> {
                             if (sender instanceof User) {
