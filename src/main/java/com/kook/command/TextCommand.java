@@ -27,7 +27,7 @@ import java.io.IOException;
  */
 
 
-public class TextCommand extends BasePlugin {
+public class TextCommand {
 
     /**
      * 发送常规文字代码
@@ -47,9 +47,6 @@ public class TextCommand extends BasePlugin {
                                         )
                                         .build();
                                 reply(sender, message, card);
-                            } else {
-                                getLogger().info("This command is not available for console.");
-                                // 这个 else 块是可选的，但为了用户体验，最好还是提醒一下
                             }
                         }
                 )

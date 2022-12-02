@@ -333,8 +333,23 @@ public class Main extends BasePlugin {
                 .register();
 
 
-
-        new TextCommand().sendText("今天吃什么",new TextCommand().chiShenMe());
+        new JKookCommand("今天吃什么懒觉")
+                .executesUser(
+                        (sender, args, message) -> {
+                            if (sender instanceof User) {
+                                MultipleCardComponent card = new CardBuilder()
+                                        .setTheme(Theme.NONE)
+                                        .setSize(Size.LG)
+                                        .addModule(
+                                                new HeaderModule(new PlainTextElement(
+                                                        new TextCommand().chiShenMe(), false))
+                                        )
+                                        .build();
+                                reply(sender, message, card);
+                            }
+                        }
+                )
+                .register();
 
         getLogger().info("PingBot 启动成功！");
     }
