@@ -4,10 +4,16 @@ package com.kook;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.kook.command.TextCommand;
 import com.kook.pojo.weather.ResultsVo;
 import com.kook.util.OkHttpClientUtil;
 import com.kook.util.PictureUtils;
 import snw.jkook.JKook;
+import okhttp3.Call;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import snw.jkook.command.JKookCommand;
 import snw.jkook.entity.User;
 import snw.jkook.entity.abilities.Accessory;
@@ -28,6 +34,7 @@ import snw.jkook.message.component.card.module.SectionModule;
 import snw.jkook.plugin.BasePlugin;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +48,7 @@ public class Main extends BasePlugin {
 
     @Override
     public void onEnable() {
+        TextCommand textCommand=new TextCommand();
         new JKookCommand("hito")
                 .executesUser(
                         (sender, args, message) -> {
@@ -305,9 +313,10 @@ public class Main extends BasePlugin {
                         }
                 )
                 .register();
-        
-        
 
+
+
+        textCommand.sendText("今天吃什么",chiShenMe());
 
         getLogger().info("PingBot 启动成功！");
     }
@@ -332,6 +341,26 @@ public class Main extends BasePlugin {
         }
     }
 
+    public String chiShenMe(){
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .addHeader("X-APISpace-Token","f2d1h2f6hhoo5ll3eop5e1vc69ekozuh")
+                .addHeader("Authorization-Type","apikey")
+                .url("https://eolink.o.apispace.com/eat222/api/v1/forward/chishenme?size=1").get().build();
+        Call call=client.newCall(request);
+        JSONObject jsonObject = null;
+        try {
+            Response response =call.execute();
+            jsonObject = JSON.parseObject(response.body().string());
+            response.close();
+
+        } catch (
+                IOException e) {
+            e.printStackTrace();
+        }
+        assert jsonObject != null;
+        return jsonObject.getJSONArray("data").get(0).toString();
+    }
 
     @Override
     public void onDisable() {
