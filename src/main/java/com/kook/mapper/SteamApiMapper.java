@@ -13,4 +13,8 @@ public interface SteamApiMapper {
 
     List<Api> getApiInfoById(String id);
 
+    Integer getSteamBdInfoByKookId(String kookId);
+
+    Integer addSteamBd(@Param("id") String id,@Param("kookId") String kookId,@Param("steamId") String steamId);
+
 }
