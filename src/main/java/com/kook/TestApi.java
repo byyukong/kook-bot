@@ -2,14 +2,21 @@ package com.kook;
 
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.kook.mapper.SteamApiMapper;
 import com.kook.util.MybatisUtils;
 import com.kook.util.OkHttpClientUtil;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Call;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,5 +56,7 @@ public class TestApi {
             sqlSession.close();
         }
     }
+
+
 
 }
