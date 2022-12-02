@@ -2,21 +2,21 @@ package com.kook;
 
 
 import com.alibaba.fastjson.JSON;
-import com.kook.command.OkHttpClientUtil;
+import com.kook.mapper.SteamApiMapper;
+import com.kook.util.MybatisUtils;
+import com.kook.util.OkHttpClientUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
-import snw.jkook.message.component.card.CardBuilder;
-import snw.jkook.message.component.card.MultipleCardComponent;
-import snw.jkook.message.component.card.Size;
-import snw.jkook.message.component.card.Theme;
-import snw.jkook.message.component.card.element.PlainTextElement;
-import snw.jkook.message.component.card.module.ContextModule;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
 public class TestApi {
+    SqlSession sqlSession = MybatisUtils.getSqlSession();
+
 
     @Test
     public void testTranslationApi() {
@@ -33,6 +33,20 @@ public class TestApi {
             System.err.println(data.get("fanyi").toString());
         } else {
             log.error("请求错误！");
+        }
+    }
+
+
+    @Test
+    public void sqlTest(){
+        //获得SqlSession对象
+        try {
+            SteamApiMapper mapper = sqlSession.getMapper(SteamApiMapper.class);
+            System.out.println(mapper.queryRole());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sqlSession.close();
         }
     }
 

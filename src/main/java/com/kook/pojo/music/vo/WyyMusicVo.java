@@ -1,4 +1,4 @@
-package com.pojo.music.vo;
+package com.kook.pojo.music.vo;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

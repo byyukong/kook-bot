@@ -1,4 +1,4 @@
-package com.pojo.music;
+package com.kook.pojo.music;
 
 import lombok.Data;
 

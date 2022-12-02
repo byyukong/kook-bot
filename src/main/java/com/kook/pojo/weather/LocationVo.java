@@ -1,4 +1,4 @@
-package com.pojo.weather;
+package com.kook.pojo.weather;
 
 import lombok.Data;
 

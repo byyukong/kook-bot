@@ -4,10 +4,9 @@ package com.kook;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.pojo.weather.ResultsVo;
-import com.kook.command.OkHttpClientUtil;
+import com.kook.pojo.weather.ResultsVo;
+import com.kook.util.OkHttpClientUtil;
 import snw.jkook.command.JKookCommand;
-import snw.jkook.command.UserCommandExecutor;
 import snw.jkook.entity.User;
 import snw.jkook.message.Message;
 import snw.jkook.message.TextChannelMessage;
@@ -60,6 +59,29 @@ public class Main extends BasePlugin {
                                         .setSize(Size.LG)
                                         .addModule(
                                                 new HeaderModule(new PlainTextElement("笨逼！", false))
+                                        )
+                                        .build();
+                                reply(sender, message, card);
+                            } else {
+                                getLogger().info("This command is not available for console.");
+                                // 这个 else 块是可选的，但为了用户体验，最好还是提醒一下
+                                // 另外，我们假设此执行器是在 Bot#onEnable 里写的，所以我们可以使用 getLogger() 。
+                            }
+                        }
+                )
+                .register();
+
+
+        new JKookCommand("getId")
+                .executesUser(
+                        (sender, args, message) -> {
+                            if (sender instanceof User) {
+                                MultipleCardComponent card = new CardBuilder()
+                                        .setTheme(Theme.NONE)
+                                        .setSize(Size.LG)
+                                        .addModule(
+                                                new HeaderModule(new PlainTextElement(
+                                                        "用户名：" + sender.getName() + "\n" + "ID：" + sender.getId(), false))
                                         )
                                         .build();
                                 reply(sender, message, card);
@@ -153,6 +175,7 @@ public class Main extends BasePlugin {
                                 if (sender instanceof User) {
                                     String res = OkHttpClientUtil.getString("https://api.oick.cn/yulu/api.php");
 
+
                                     if (null != res) {
                                         MultipleCardComponent card = new CardBuilder()
                                                 .setTheme(Theme.NONE)
@@ -175,7 +198,7 @@ public class Main extends BasePlugin {
                     .register();
 
 
-        /*new JKookCommand("翻译")
+        new JKookCommand("翻译")
                 .executesUser(
                         (sender, args, message) -> {
                             if (sender instanceof User) {
@@ -213,7 +236,7 @@ public class Main extends BasePlugin {
                             }
                         }
                 )
-                .register();*/
+                .register();
 
 
         getLogger().info("PingBot 启动成功！");
