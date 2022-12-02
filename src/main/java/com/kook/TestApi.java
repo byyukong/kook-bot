@@ -5,12 +5,14 @@ import com.alibaba.fastjson.JSON;
 import com.kook.mapper.SteamApiMapper;
 import com.kook.util.MybatisUtils;
 import com.kook.util.OkHttpClientUtil;
+import com.kook.util.PictureUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 import sun.dc.pr.PRError;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
