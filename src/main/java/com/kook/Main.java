@@ -6,9 +6,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.kook.command.TextCommand;
+import com.kook.mapper.SteamApiMapper;
 import com.kook.pojo.weather.ResultsVo;
+import com.kook.util.MybatisUtils;
 import com.kook.util.OkHttpClientUtil;
 import com.kook.util.PictureUtils;
+import org.apache.ibatis.session.SqlSession;
 import snw.jkook.JKook;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
@@ -37,8 +40,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class Main extends BasePlugin {
+
+    private SqlSession sqlSession = MybatisUtils.getSqlSession();
+    private SteamApiMapper steamApiMapper = sqlSession.getMapper(SteamApiMapper.class);
+
     @Override
     public void onLoad() {
         // 重写 onLoad 并不是必须的，但是您可以在此阶段做一些初始化工作，比如解压默认的配置文件 (saveDefaultConfig)1
@@ -218,22 +226,32 @@ public class Main extends BasePlugin {
                 .executesUser(
                         (sender, args, message) -> {
                             if (sender instanceof User) {
-                                String res = OkHttpClientUtil.getString("https://api.oick.cn/yulu/api.php");
+                                try {
+                                    if (args.length != 1) {
+                                        if (steamApiMapper.getSteamBdInfoByKookId(sender.getId()) > 0) {
+                                            reply(sender, message, "已经绑定过了！");
+                                        } else {
+                                            steamApiMapper.addSteamBd(UUID.randomUUID().toString().replace("-",""),sender.getId(),args[0]);
+                                            sqlSession.commit();
+                                        }
+                                    }else {
+                                        reply(sender, message, "请输入SteamId，格式 /steambd xxx！");
+                                    }
 
-
-                                if (null != res) {
-                                    MultipleCardComponent card = new CardBuilder()
-                                            .setTheme(Theme.NONE)
-                                            .setSize(Size.LG)
-                                            .addModule(
-                                                    new ContextModule.Builder()
-                                                            .add(new PlainTextElement(res.substring(1,res.length() -1), false)).build()
-                                            )
-                                            .build();
-                                    reply(sender, message, card);
-                                } else {
-                                    reply(sender, message, "请求错误！");
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                } finally {
+                                    sqlSession.close();
                                 }
+                                MultipleCardComponent card = new CardBuilder()
+                                        .setTheme(Theme.NONE)
+                                        .setSize(Size.LG)
+                                        .addModule(
+                                                new ContextModule.Builder()
+                                                        .add(new PlainTextElement("", false)).build()
+                                        )
+                                        .build();
+                                reply(sender, message, card);
 
                             } else {
                                 getLogger().info("This command is not available for console.");
