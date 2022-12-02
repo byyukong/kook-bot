@@ -56,7 +56,7 @@ public class Main extends BasePlugin {
 
     @Override
     public void onEnable() {
-        TextCommand textCommand=new TextCommand();
+
         new JKookCommand("hito")
                 .executesUser(
                         (sender, args, message) -> {
@@ -334,7 +334,7 @@ public class Main extends BasePlugin {
 
 
 
-        textCommand.sendText("今天吃什么",textCommand.chiShenMe());
+        new TextCommand().sendText("今天吃什么",new TextCommand().chiShenMe());
 
         getLogger().info("PingBot 启动成功！");
     }
