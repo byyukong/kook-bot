@@ -4,23 +4,15 @@ package com.kook;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.kook.Instruction.*;
 import com.kook.command.TextCommand;
 import com.kook.mapper.SteamApiMapper;
-import com.kook.pojo.Api;
-import com.kook.pojo.SteamKook;
-import com.kook.pojo.steam.SteamGamesVo;
-import com.kook.pojo.steam.SteamResponseVo;
 import com.kook.pojo.weather.ResultsVo;
 import com.kook.util.MybatisUtils;
 import com.kook.util.OkHttpClientUtil;
 import com.kook.util.PictureUtils;
 import org.apache.ibatis.session.SqlSession;
 import snw.jkook.JKook;
-import okhttp3.Call;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import snw.jkook.command.JKookCommand;
 import snw.jkook.entity.User;
 import snw.jkook.entity.abilities.Accessory;
@@ -41,11 +33,11 @@ import snw.jkook.message.component.card.module.SectionModule;
 import snw.jkook.plugin.BasePlugin;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+
+import static com.kook.Instruction.HitoInstruction.getHito;
+import static com.kook.Instruction.steam.SteamInstruction.bindSteam;
+import static com.kook.Instruction.steam.SteamInstruction.getStringInfo;
 
 public class Main extends BasePlugin {
 
@@ -62,378 +54,68 @@ public class Main extends BasePlugin {
     @Override
     public void onEnable() {
 
-        new JKookCommand("hito")
-                .executesUser(
-                        (sender, args, message) -> {
-                            if (sender instanceof User) { // 确保是个 Kook 用户在执行此命令
-                                Map<String,Object> map = OkHttpClientUtil.get("https://v1.hitokoto.cn/");
-                                reply(sender, message, map.get("hitokoto").toString());
-                            } else {
-                                getLogger().info("This command is not available for console.");
-                                // 这个 else 块是可选的，但为了用户体验，最好还是提醒一下
-                                // 另外，我们假设此执行器是在 Bot#onEnable 里写的，所以我们可以使用 getLogger() 。
-                            }
-                        }
-                )
-                .register();
+        /**
+         * /hito
+         * 查询一言
+         */
+        HitoInstruction.getHito();
 
+        /**
+         * /赵腾鹏
+         * 骂tp
+         */
+        TpInstruction.getTp();
 
-        new JKookCommand("赵腾鹏")
-                .executesUser(
-                        (sender, args, message) -> {
-                            if (sender instanceof User) {
-                                MultipleCardComponent card = new CardBuilder()
-                                        .setTheme(Theme.NONE)
-                                        .setSize(Size.LG)
-                                        .addModule(
-                                                new HeaderModule(new PlainTextElement("笨逼！", false))
-                                        )
-                                        .build();
-                                reply(sender, message, card);
-                            } else {
-                                getLogger().info("This command is not available for console.");
-                                // 这个 else 块是可选的，但为了用户体验，最好还是提醒一下
-                                // 另外，我们假设此执行器是在 Bot#onEnable 里写的，所以我们可以使用 getLogger() 。
-                            }
-                        }
-                )
-                .register();
+        /**
+         * /getId
+         * 查询用户信息
+         */
+        KookInfoInstruction.getId();
 
+        /**
+         * /weather
+         * 查询天气
+         */
+        WeatherInstruction.getWeather();
 
-        new JKookCommand("getId")
-                .executesUser(
-                        (sender, args, message) -> {
-                            if (sender instanceof User) {
-                                MultipleCardComponent card = new CardBuilder()
-                                        .setTheme(Theme.NONE)
-                                        .setSize(Size.LG)
-                                        .addModule(
-                                                new HeaderModule(new PlainTextElement(
-                                                        "用户名：" + sender.getName() + "\n" + "ID：" + sender.getId(), false))
-                                        )
-                                        .build();
-                                reply(sender, message, card);
-                            } else {
-                                getLogger().info("This command is not available for console.");
-                                // 这个 else 块是可选的，但为了用户体验，最好还是提醒一下
-                                // 另外，我们假设此执行器是在 Bot#onEnable 里写的，所以我们可以使用 getLogger() 。
-                            }
-                        }
-                )
-                .register();
+        /**
+         * /舔狗
+         * 查询舔狗语录
+         */
+        DogInstruction.getDog();
 
+        /**
+         * /社会
+         * 查询社会语录
+         */
+        SocietyInstruction.getSociety();
 
-        new JKookCommand("weather")
-                .executesUser(
-                        (sender, args, message) -> {
-                            if (sender instanceof User) {
-                                if (args.length == 1){
-                                    Map<String,Object> map = OkHttpClientUtil.get(
-                                            "https://api.seniverse.com/v3/weather/now.json" +
-                                                    "?key=SCYrvkytJze9qyzOh&location=" + args[0] + "&language=zh-Hans&unit=c"
-                                    );
+        /**
+         * /steambd
+         * 绑定Steam
+         */
+        bindSteam();
 
-                                    if (map.containsKey("status_code")){
-                                        reply(sender, message, "查询不到城市！");
-                                    }else {
-                                        JSONArray results1 = JSON.parseArray(map.get("results").toString());
+        /**
+         * /steaminfo
+         * 查询Steam信息
+         */
+        getStringInfo();
 
-                                        ResultsVo resultsVo = JSON.parseObject(results1.get(0).toString(), ResultsVo.class);
+        /**
+         * /摸鱼
+         * 查询摸鱼日报
+         */
+        FishInstruction.getFish();
 
-                                        MultipleCardComponent card = new CardBuilder()
-                                                .setTheme(Theme.NONE)
-                                                .setSize(Size.LG)
-                                                .addModule(
-                                                        new ContextModule.Builder()
-                                                                .add(new PlainTextElement("城市：" + resultsVo
-                                                                        .getLocation().getName() + "\n" + "天气：" +
-                                                                        resultsVo.getNow()
-                                                                        .getText() + "\n" + "温度：" + resultsVo.getNow()
-                                                                        .getTemperature(), false)).build()
-                                                )
-                                                .build();
-
-                                        reply(sender, message, card);
-
-                                    }
-
-
-                                }else {
-                                    reply(sender, message, "请输入需要查询的城市，/weather 城市");
-                                }
-
-                            } else {
-                                getLogger().info("This command is not available for console.");
-                            }
-                        }
-                )
-                .register();
-
-        new JKookCommand("舔狗")
-                .executesUser(
-                        (sender, args, message) -> {
-                            if (sender instanceof User) {
-                                String res = OkHttpClientUtil.getString("http://api.gt5.cc/api/dog");
-
-                                if (null != res) {
-                                    MultipleCardComponent card = new CardBuilder()
-                                            .setTheme(Theme.NONE)
-                                            .setSize(Size.LG)
-                                            .addModule(
-                                                    new ContextModule.Builder()
-                                                            .add(new PlainTextElement(res, false)).build()
-                                            )
-                                            .build();
-                                    reply(sender, message, card);
-                                } else {
-                                    reply(sender, message, "请求错误！");
-                                }
-
-                            } else {
-                                getLogger().info("This command is not available for console.");
-                            }
-                        }
-                )
-                .register();
-
-
-            new JKookCommand("社会")
-                    .executesUser(
-                            (sender, args, message) -> {
-                                if (sender instanceof User) {
-                                    String res = OkHttpClientUtil.getString("https://api.oick.cn/yulu/api.php");
-
-
-                                    if (null != res) {
-                                        MultipleCardComponent card = new CardBuilder()
-                                                .setTheme(Theme.NONE)
-                                                .setSize(Size.LG)
-                                                .addModule(
-                                                        new ContextModule.Builder()
-                                                                .add(new PlainTextElement(res.substring(1,res.length() -1), false)).build()
-                                                )
-                                                .build();
-                                        reply(sender, message, card);
-                                    } else {
-                                        reply(sender, message, "请求错误！");
-                                    }
-
-                                } else {
-                                    getLogger().info("This command is not available for console.");
-                                }
-                            }
-                    )
-                    .register();
-
-
-
-        new JKookCommand("steambd")
-                .executesUser(
-                        (sender, args, message) -> {
-                            if (sender instanceof User) {
-                                if (args.length == 1) {
-                                    if (args[0].length() == 17) {
-                                        if (steamApiMapper.getSteamBdCountByKookId(sender.getId()) > 0) {
-                                            reply(sender, message, "已经绑定过了！");
-                                        } else {
-                                            steamApiMapper.addSteamBd(UUID.randomUUID().toString().replace("-",""),sender.getId(),args[0]);
-                                            reply(sender, message, "绑定Steam成功！");
-                                            sqlSession.commit();
-                                        }
-                                    }else {
-                                        reply(sender, message, "SteamID格式不正确！");
-                                    }
-
-                                }else {
-                                    reply(sender, message, "请输入SteamID，格式 /steambd 17位SeamID！");
-                                }
-
-                            } else {
-                                getLogger().info("This command is not available for console.");
-                            }
-                        }
-                )
-                .register();
-
-
-        new JKookCommand("steaminfo")
-                .executesUser(
-                        (sender, args, message) -> {
-                            if (sender instanceof User) {
-                                SteamKook steamInfo = steamApiMapper.getSteamBdInfoByKookId(sender.getId());
-                                getLogger().info("用户ID" + sender.getId());
-                                getLogger().info(JSON.toJSONString(steamInfo));
-                                if (null != steamInfo){
-                                    Api apiInfoById = steamApiMapper.getApiInfoById("9e04d6e3e8db4efa914e60fb94d80114");
-                                    String url = apiInfoById.getApiUrl() + "?key=" + apiInfoById.getAppKey() + "&steamid=" + steamInfo.getSteamId() + "&count=3";
-                                    Map<String, Object> res = OkHttpClientUtil.get(url);
-
-                                    SteamResponseVo steamResponseVo = JSON.parseObject(res.get("response").toString(), SteamResponseVo.class);
-                                    getLogger().info("最近游玩游戏数：" + steamResponseVo.getTotalCount());
-
-
-                                    steamResponseVo.getGames().forEach(item -> {
-                                        Double playtime2weeks = Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytime2weeks()) / 60));
-                                        File file = null;
-                                        try {
-                                            file = PictureUtils.UrlToFile("https://steamcdn-a.akamaihd.net/steam/apps/" +item.getAppid()+ "/header.jpg");
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                        MultipleCardComponent card = new CardBuilder()
-                                                .setTheme(Theme.NONE)
-                                                .setSize(Size.LG).addModule(new SectionModule(new MarkdownElement("游戏名：" + item.getName() + "\n" +
-                                                        "最近两周游戏时间：" + playtime2weeks + "\n" +
-                                                        "总时长：" + Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytimeForever()) / 60)) + "\n" +
-                                                        "Windows游戏时间：" + Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytimeWindowsForever()) / 60)) + "\n" +
-                                                        "MAC游戏时间：" + Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytimeMacForever()) / 60)) + "\n" +
-                                                        "Linux游戏时间：" + Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytimeLinuxForever()) / 60)) + "\n" +
-                                                        "游戏ID：" + item.getAppid() + "\n"
-                                                )
-                                                        ,file != null ? new ImageElement(
-                                                        JKook.getHttpAPI().uploadFile(file),
-                                                        null,
-                                                        Size.LG,
-                                                        false
-                                                ):null,
-                                                        file !=null ? Accessory.Mode.RIGHT : null))
-                                                .build();
-
-
-                                        reply(sender, message, card);
-                                    });
-
-
-
-
-
-                                }else {
-                                    reply(sender, message, "请先绑定Steam！");
-                                }
-                            } else {
-                                getLogger().info("This command is not available for console.");
-                            }
-                        }
-                )
-                .register();
-
-
-
-
-        /*new JKookCommand("翻译")
-                .executesUser(
-                        (sender, args, message) -> {
-                            if (sender instanceof User) {
-                                if (args.length == 1) {
-                                    Map<String,Object> res = new HashMap<>();
-                                    try {
-                                        String url = "https://api.vvhan.com/api/fy?text=" + args[0];
-                                        getLogger().info(url);
-                                        res = OkHttpClientUtil.get(url);
-                                    } catch (Exception e){
-
-                                        reply(sender, message, "请求错误！");
-                                    }
-                                    if (null != res) {
-                                        Map<String,Object> data = JSON.parseObject(res.get("data").toString(), Map.class);
-                                        MultipleCardComponent card = new CardBuilder()
-                                                .setTheme(Theme.NONE)
-                                                .setSize(Size.LG)
-                                                .addModule(
-                                                        new ContextModule.Builder()
-                                                                .add(new PlainTextElement("翻译结果：" + data.get("fanyi").toString(), false)).build()
-                                                )
-                                                .build();
-                                        reply(sender, message, card);
-                                    } else {
-                                        reply(sender, message, "请求错误！");
-                                    }
-                                }else {
-                                    reply(sender, message, "请输入需要翻译的内容，格式 /翻译 内容！");
-                                }
-
-
-                            } else {
-                                getLogger().info("This command is not available for console.");
-                            }
-                        }
-                )
-                .register();*/
-
-        new JKookCommand("摸鱼")
-                .executesUser(
-                        (sender, args, message) -> {
-                            if (sender instanceof User) {
-                                Map<String,Object> res = OkHttpClientUtil.get("https://api.vvhan.com/api/moyu?type=json");
-                                try {
-                                    File file = PictureUtils.UrlToFile(res.get("url").toString());
-                                    MultipleCardComponent card = new CardBuilder()
-                                            .setTheme(Theme.NONE)
-                                            .setSize(Size.LG)
-                                            .addModule(new HeaderModule(new PlainTextElement("!!!", false)))
-                                            .addModule(new SectionModule(new MarkdownElement("摸鱼图片:")
-                                                    ,file != null ? new ImageElement(
-                                                            JKook.getHttpAPI().uploadFile(file),
-                                                    null,
-                                                    Size.SM,
-                                                    false
-                                            ):null,
-                                                    file !=null ? Accessory.Mode.RIGHT : null))
-                                            .build();
-                                    reply(sender, message, card);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            } else {
-                                getLogger().info("This command is not available for console.");
-                            }
-                        }
-                )
-                .register();
-
-
-        new JKookCommand("今天吃什么懒觉")
-                .executesUser(
-                        (sender, args, message) -> {
-                            if (sender instanceof User) {
-                                MultipleCardComponent card = new CardBuilder()
-                                        .setTheme(Theme.NONE)
-                                        .setSize(Size.LG)
-                                        .addModule(
-                                                new HeaderModule(new PlainTextElement(
-                                                        new TextCommand().chiShenMe(), false))
-                                        )
-                                        .build();
-                                reply(sender, message, card);
-                            }
-                        }
-                )
-                .register();
+        /**
+         * /今天吃什么懒觉
+         * 查询今天吃什么
+         */
+        EatInstruction.getEat();
 
         getLogger().info("PingBot 启动成功！");
     }
-
-
-    private void reply(User sender, Message message, String content) {
-        ((TextChannelMessage) message).getChannel().sendComponent(
-                new MarkdownComponent(content),
-                (TextChannelMessage) message,null
-        );
-    }
-
-    private void reply(User sender, Message message, BaseComponent component) {
-        if (message instanceof TextChannelMessage) {
-            ((TextChannelMessage) message).getChannel().sendComponent(
-                    component,
-                    null, //(TextChannelMessage) message,
-                    null
-            );
-        } else {
-            sender.sendPrivateMessage(component);
-        }
-    }
-
-
 
     @Override
     public void onDisable() {
