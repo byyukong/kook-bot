@@ -265,7 +265,7 @@ public class Main extends BasePlugin {
                                 getLogger().info(JSON.toJSONString(steamInfo));
                                 if (null != steamInfo){
                                     Api apiInfoById = steamApiMapper.getApiInfoById("9e04d6e3e8db4efa914e60fb94d80114");
-                                    String url = apiInfoById.getApiUrl() + "?key=" + apiInfoById.getAppKey() + "&steamid=" + steamInfo.getSteamId();
+                                    String url = apiInfoById.getApiUrl() + "?key=" + apiInfoById.getAppKey() + "&steamid=" + steamInfo.getSteamId() + "&count=3";
                                     Map<String, Object> res = OkHttpClientUtil.get(url);
 
                                     SteamResponseVo steamResponseVo = JSON.parseObject(res.get("response").toString(), SteamResponseVo.class);
@@ -274,21 +274,31 @@ public class Main extends BasePlugin {
 
                                     steamResponseVo.getGames().forEach(item -> {
                                         Double playtime2weeks = Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytime2weeks()) / 60));
-
+                                        File file = null;
+                                        try {
+                                            file = PictureUtils.UrlToFile("https://steamcdn-a.akamaihd.net/steam/apps/" +item.getAppid()+ "/header.jpg");
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
                                         MultipleCardComponent card = new CardBuilder()
                                                 .setTheme(Theme.NONE)
-                                                .setSize(Size.LG)
-                                                .addModule(
-                                                        new ContextModule.Builder()
-                                                                .add(new PlainTextElement(
-                                                                        "游戏名：" + item.getName() + "\n" +
-                                                                                "最近两周游戏时间：" + playtime2weeks + "\n" +
-                                                                                "Windows游戏时间：" + Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytimeWindowsForever()) / 60)) + "\n" +
-                                                                                "MAC游戏时间：" + Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytimeMacForever()) / 60)) + "\n" +
-                                                                                "Linux游戏时间：" + Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytimeLinuxForever()) / 60)) + "\n"
-                                                                        , false)).build()
+                                                .setSize(Size.LG).addModule(new SectionModule(new MarkdownElement("游戏名：" + item.getName() + "\n" +
+                                                        "最近两周游戏时间：" + playtime2weeks + "\n" +
+                                                        "总时长：" + Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytimeForever()) / 60)) + "\n" +
+                                                        "Windows游戏时间：" + Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytimeWindowsForever()) / 60)) + "\n" +
+                                                        "MAC游戏时间：" + Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytimeMacForever()) / 60)) + "\n" +
+                                                        "Linux游戏时间：" + Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytimeLinuxForever()) / 60)) + "\n" +
+                                                        "游戏ID：" + item.getAppid() + "\n"
                                                 )
+                                                        ,file != null ? new ImageElement(
+                                                        JKook.getHttpAPI().uploadFile(file),
+                                                        null,
+                                                        Size.LG,
+                                                        false
+                                                ):null,
+                                                        file !=null ? Accessory.Mode.RIGHT : null))
                                                 .build();
+
 
                                         reply(sender, message, card);
                                     });
