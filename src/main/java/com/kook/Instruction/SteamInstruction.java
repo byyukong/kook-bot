@@ -56,7 +56,7 @@ public class SteamInstruction {
                                     }
 
                                 }else {
-                                    reply(sender, message, "请输入SteamID，格式 /steambd 17位SeamID！");
+                                    reply(sender, message, "请输入SteamID，格式 /steambd 64位SeamID！");
                                 }
 
                             } else {
