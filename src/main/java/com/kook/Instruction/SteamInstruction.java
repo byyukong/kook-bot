@@ -173,8 +173,8 @@ public class SteamInstruction {
                                             status = "离开";
                                             break;
                                     }
-                                    String timecreatedDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date(Long.parseLong(players.get("timecreated").toString()) * 1000));
-                                    String lastlogoffDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date(Long.parseLong(players.get("lastlogoff").toString()) * 1000));
+                                    String timecreatedDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(Long.parseLong(players.get("timecreated").toString()) * 1000));
+                                    String lastlogoffDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(Long.parseLong(players.get("lastlogoff").toString()) * 1000));
 
                                     StringBuffer sb = new StringBuffer("用户名：" + players.get("personaname").toString() + "\n");
                                     sb.append("等级：" + levelResponse.get("player_level") + "\n");
