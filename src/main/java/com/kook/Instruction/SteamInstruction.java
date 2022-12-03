@@ -78,8 +78,15 @@ public class SteamInstruction {
                                 log.info(JSON.toJSONString(steamInfo));
                                 if (null != steamInfo){
                                     Api apiInfoById = steamApiMapper.getApiInfoById("9e04d6e3e8db4efa914e60fb94d80114");
-                                    String url = apiInfoById.getApiUrl() + "?key=" + apiInfoById.getAppKey() + "&steamid=" + steamInfo.getSteamId() + "&count=3";
-                                    Map<String, Object> res = OkHttpClientUtil.get(url);
+                                    StringBuffer url = new StringBuffer(apiInfoById.getApiUrl() + "?key=" + apiInfoById.getAppKey() + "&steamid=" + steamInfo.getSteamId());
+
+                                    if (args.length > 0) {
+                                        url.append("&count=" + args[0]);
+                                    }else {
+                                        url.append("&count=3");
+                                    }
+
+                                    Map<String, Object> res = OkHttpClientUtil.get(url.toString());
 
                                     SteamResponseVo steamResponseVo = JSON.parseObject(res.get("response").toString(), SteamResponseVo.class);
                                     log.info("最近游玩游戏数：" + steamResponseVo.getTotalCount());
@@ -117,14 +124,10 @@ public class SteamInstruction {
 
                                         reply(sender, message, card);
                                     });
-
-
-
-
-
                                 }else {
                                     reply(sender, message, "请先绑定Steam！");
                                 }
+
                             } else {
                                 log.info("This command is not available for console.");
                             }
