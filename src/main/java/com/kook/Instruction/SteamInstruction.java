@@ -23,6 +23,8 @@ import snw.jkook.message.component.card.element.MarkdownElement;
 import snw.jkook.message.component.card.module.SectionModule;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -130,5 +132,89 @@ public class SteamInstruction {
                 )
                 .register();
     }
+
+
+    /**
+     * 获取个人信息
+     */
+    public static void steamPer (){
+        new JKookCommand("steamper")
+                .executesUser(
+                        (sender, args, message) -> {
+                            if (sender instanceof User) {
+                                SteamKook steamInfo = steamApiMapper.getSteamBdInfoByKookId("3568540449");
+                                if (null != steamInfo){
+                                    //personastate: 0隐身 | 离线，1在线，3离开
+                                    Api apiInfoById = steamApiMapper.getApiInfoById("6e24e9f01c0a4beeac02fd1e154df5f9");
+                                    String url = apiInfoById.getApiUrl() + "?key=" + apiInfoById.getAppKey() + "&steamids=" + steamInfo.getSteamId();
+                                    Map<String, Object> res = OkHttpClientUtil.get(url);
+                                    Map<String, Object> response = JSON.parseObject(res.get("response").toString(), Map.class);
+                                    Map<String,Object> players = JSON.parseObject(JSON.toJSONString(response.get("players")).replace("[", "").replace("]", ""), Map.class);
+
+                                    Api getLevelUrl = steamApiMapper.getApiInfoById("92141df427ea475796e8e276e7c856d6");
+                                    String levelUrl = getLevelUrl.getApiUrl() + "?key=" + getLevelUrl.getAppKey() + "&steamid=" + steamInfo.getSteamId();
+                                    Map<String, Object> levelRes = OkHttpClientUtil.get(levelUrl);
+                                    Map<String, Object> levelResponse = JSON.parseObject(levelRes.get("response").toString(), Map.class);
+
+
+                                    String statusCode = players.get("personastate").toString();
+                                    String status = "";
+                                    switch (statusCode) {
+                                        case "0":
+                                            status = "离线";
+                                            break;
+                                        case "1":
+                                            status = "在线";
+                                            break;
+                                        case "3":
+                                            status = "离开";
+                                            break;
+                                    }
+                                    String timecreatedDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date(Long.parseLong(players.get("timecreated").toString()) * 1000));
+                                    String lastlogoffDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date(Long.parseLong(players.get("lastlogoff").toString()) * 1000));
+
+                                    StringBuffer sb = new StringBuffer("用户名：" + players.get("personaname").toString() + "\n");
+                                    sb.append("等级：" + levelResponse.get("player_level") + "\n");
+                                    sb.append("状态：" + status + "\n");
+                                    if (players.containsKey("gameextrainfo")){
+                                        sb.append("正在玩：" + players.get("gameextrainfo") + "\n");
+                                    }
+                                    sb.append("最后登录时间：" + lastlogoffDate + "\n");
+                                    sb.append("账号创建时间：" + timecreatedDate);
+
+                                    File file = null;
+                                    try {
+                                        file = PictureUtils.UrlToFile(players.get("avatarfull").toString());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    MultipleCardComponent card = new CardBuilder()
+                                            .setTheme(Theme.NONE)
+                                            .setSize(Size.LG).addModule(new SectionModule(new MarkdownElement(sb.toString())
+                                                    ,file != null ? new ImageElement(
+                                                    JKook.getHttpAPI().uploadFile(file),
+                                                    null,
+                                                    Size.LG,
+                                                    false
+                                            ):null,
+                                                    file !=null ? Accessory.Mode.RIGHT : null))
+                                            .build();
+
+
+                                    reply(sender, message, card);
+
+
+                                }else {
+                                    reply(sender,message,"请先绑定Steam！");
+                                }
+                            } else {
+                                log.info("This command is not available for console.");
+                            }
+                        }
+                )
+                .register();
+    }
+
 
 }

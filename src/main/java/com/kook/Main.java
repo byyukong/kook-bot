@@ -66,13 +66,20 @@ public class Main extends BasePlugin {
          * /steambd
          * 绑定Steam
          */
-        bindSteam();
+        SteamInstruction.bindSteam();
 
         /**
          * /steaminfo
-         * 查询Steam信息
+         * 查询Steam最近两周游玩信息
          */
-        getStringInfo();
+        SteamInstruction.getStringInfo();
+
+        /**
+         * /steamper
+         * 查询Steam个人信息
+         */
+        SteamInstruction.steamPer();
+
 
         /**
          * /摸鱼
