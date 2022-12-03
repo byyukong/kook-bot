@@ -1,4 +1,4 @@
-package com.kook.Instruction.steam;
+package com.kook.Instruction;
 
 import com.alibaba.fastjson.JSON;
 import com.kook.mapper.SteamApiMapper;

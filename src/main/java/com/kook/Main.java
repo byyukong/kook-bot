@@ -2,42 +2,14 @@ package com.kook;
 
 // import 被忽略
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.kook.Instruction.*;
-import com.kook.command.TextCommand;
 import com.kook.mapper.SteamApiMapper;
-import com.kook.pojo.weather.ResultsVo;
 import com.kook.util.MybatisUtils;
-import com.kook.util.OkHttpClientUtil;
-import com.kook.util.PictureUtils;
 import org.apache.ibatis.session.SqlSession;
-import snw.jkook.JKook;
-import snw.jkook.command.JKookCommand;
-import snw.jkook.entity.User;
-import snw.jkook.entity.abilities.Accessory;
-import snw.jkook.message.Message;
-import snw.jkook.message.TextChannelMessage;
-import snw.jkook.message.component.BaseComponent;
-import snw.jkook.message.component.MarkdownComponent;
-import snw.jkook.message.component.card.CardBuilder;
-import snw.jkook.message.component.card.MultipleCardComponent;
-import snw.jkook.message.component.card.Size;
-import snw.jkook.message.component.card.Theme;
-import snw.jkook.message.component.card.element.ImageElement;
-import snw.jkook.message.component.card.element.MarkdownElement;
-import snw.jkook.message.component.card.element.PlainTextElement;
-import snw.jkook.message.component.card.module.ContextModule;
-import snw.jkook.message.component.card.module.HeaderModule;
-import snw.jkook.message.component.card.module.SectionModule;
 import snw.jkook.plugin.BasePlugin;
 
-import java.io.File;
-import java.util.Map;
-
-import static com.kook.Instruction.HitoInstruction.getHito;
-import static com.kook.Instruction.steam.SteamInstruction.bindSteam;
-import static com.kook.Instruction.steam.SteamInstruction.getStringInfo;
+import static com.kook.Instruction.SteamInstruction.bindSteam;
+import static com.kook.Instruction.SteamInstruction.getStringInfo;
 
 public class Main extends BasePlugin {
 
