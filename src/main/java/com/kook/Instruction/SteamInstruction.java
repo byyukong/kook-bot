@@ -176,8 +176,12 @@ public class SteamInstruction {
         //personastate: 0隐身 | 离线，1在线，3离开
         Api apiInfoById = steamApiMapper.getApiInfoById("6e24e9f01c0a4beeac02fd1e154df5f9");
         String url = apiInfoById.getApiUrl() + "?key=" + apiInfoById.getAppKey() + "&steamids=" + steamId;
+
+        log.info("查询个人信息：" + url);
+
         Map<String, Object> res = OkHttpClientUtil.get(url);
         Map<String, Object> response = JSON.parseObject(res.get("response").toString(), Map.class);
+
         Map<String,Object> players = JSON.parseObject(JSON.toJSONString(response.get("players")).replace("[", "").replace("]", ""), Map.class);
 
         Api getLevelUrl = steamApiMapper.getApiInfoById("92141df427ea475796e8e276e7c856d6");
@@ -200,7 +204,8 @@ public class SteamInstruction {
                 break;
         }
         String timecreatedDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(Long.parseLong(players.get("timecreated").toString()) * 1000));
-        String lastlogoffDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(Long.parseLong(players.get("lastlogoff").toString()) * 1000));
+
+
 
         StringBuffer sb = new StringBuffer("用户名：" + players.get("personaname").toString() + "\n");
         sb.append("等级：" + levelResponse.get("player_level") + "\n");
@@ -208,7 +213,11 @@ public class SteamInstruction {
         if (players.containsKey("gameextrainfo")){
             sb.append("正在玩：" + players.get("gameextrainfo") + "\n");
         }
-        sb.append("最后登录时间：" + lastlogoffDate + "\n");
+        if (players.containsKey("lastlogoff")) {
+            String lastlogoffDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(Long.parseLong(players.get("lastlogoff").toString()) * 1000));
+            sb.append("最后登录时间：" + lastlogoffDate + "\n");
+        }
+
         sb.append("账号创建时间：" + timecreatedDate);
 
         File file = null;
