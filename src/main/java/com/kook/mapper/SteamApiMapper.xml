@@ -4,12 +4,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kook.mapper.SteamApiMapper">
 
-    <select id="getApiInfoById" resultType="com.kook.pojo.Api">
+    <select id="getApiInfoById" resultType="com.kook.pojo.Api" flushCache="true">
         SELECT APP_KEY,API_URL FROM API WHERE ID = #{id}  AND IS_DELETED = 0
     </select>
 
 
-    <select id="getSteamBdCountByKookId" resultType="int">
+    <select id="getSteamBdCountByKookId" resultType="int" flushCache="true">
         SELECT COUNT(1) FROM STEAM_KOOK WHERE KOOK_ID = #{kookId} AND IS_DELETED = 0
     </select>
 
@@ -18,7 +18,7 @@
         (#{id},#{kookId},#{steamId},0)
     </insert>
 
-    <select id="getSteamBdInfoByKookId" resultType="com.kook.pojo.SteamKook">
+    <select id="getSteamBdInfoByKookId" resultType="com.kook.pojo.SteamKook" flushCache="true">
         SELECT STEAM_ID FROM STEAM_KOOK WHERE KOOK_ID = #{kookId} AND IS_DELETED = 0
     </select>
 </mapper>

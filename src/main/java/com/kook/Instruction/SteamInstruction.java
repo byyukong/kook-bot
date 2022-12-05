@@ -14,6 +14,7 @@ import snw.jkook.JKook;
 import snw.jkook.command.JKookCommand;
 import snw.jkook.entity.User;
 import snw.jkook.entity.abilities.Accessory;
+import snw.jkook.message.Message;
 import snw.jkook.message.component.card.CardBuilder;
 import snw.jkook.message.component.card.MultipleCardComponent;
 import snw.jkook.message.component.card.Size;
@@ -145,72 +146,22 @@ public class SteamInstruction {
                 .executesUser(
                         (sender, args, message) -> {
                             if (sender instanceof User) {
-                                SteamKook steamInfo = steamApiMapper.getSteamBdInfoByKookId("3568540449");
-                                if (null != steamInfo){
-                                    //personastate: 0隐身 | 离线，1在线，3离开
-                                    Api apiInfoById = steamApiMapper.getApiInfoById("6e24e9f01c0a4beeac02fd1e154df5f9");
-                                    String url = apiInfoById.getApiUrl() + "?key=" + apiInfoById.getAppKey() + "&steamids=" + steamInfo.getSteamId();
-                                    Map<String, Object> res = OkHttpClientUtil.get(url);
-                                    Map<String, Object> response = JSON.parseObject(res.get("response").toString(), Map.class);
-                                    Map<String,Object> players = JSON.parseObject(JSON.toJSONString(response.get("players")).replace("[", "").replace("]", ""), Map.class);
-
-                                    Api getLevelUrl = steamApiMapper.getApiInfoById("92141df427ea475796e8e276e7c856d6");
-                                    String levelUrl = getLevelUrl.getApiUrl() + "?key=" + getLevelUrl.getAppKey() + "&steamid=" + steamInfo.getSteamId();
-                                    Map<String, Object> levelRes = OkHttpClientUtil.get(levelUrl);
-                                    Map<String, Object> levelResponse = JSON.parseObject(levelRes.get("response").toString(), Map.class);
-
-
-                                    String statusCode = players.get("personastate").toString();
-                                    String status = "";
-                                    switch (statusCode) {
-                                        case "0":
-                                            status = "离线";
-                                            break;
-                                        case "1":
-                                            status = "在线";
-                                            break;
-                                        case "3":
-                                            status = "离开";
-                                            break;
+                                if (args.length > 0){
+                                    if (args[0].length() == 17) {
+                                        steamPerExtraction(sender,message,args[0]);
+                                    } else {
+                                        reply(sender,message,"SteamID格式不正确！");
                                     }
-                                    String timecreatedDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(Long.parseLong(players.get("timecreated").toString()) * 1000));
-                                    String lastlogoffDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(Long.parseLong(players.get("lastlogoff").toString()) * 1000));
-
-                                    StringBuffer sb = new StringBuffer("用户名：" + players.get("personaname").toString() + "\n");
-                                    sb.append("等级：" + levelResponse.get("player_level") + "\n");
-                                    sb.append("状态：" + status + "\n");
-                                    if (players.containsKey("gameextrainfo")){
-                                        sb.append("正在玩：" + players.get("gameextrainfo") + "\n");
-                                    }
-                                    sb.append("最后登录时间：" + lastlogoffDate + "\n");
-                                    sb.append("账号创建时间：" + timecreatedDate);
-
-                                    File file = null;
-                                    try {
-                                        file = PictureUtils.UrlToFile(players.get("avatarfull").toString());
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-
-                                    MultipleCardComponent card = new CardBuilder()
-                                            .setTheme(Theme.NONE)
-                                            .setSize(Size.LG).addModule(new SectionModule(new MarkdownElement(sb.toString())
-                                                    ,file != null ? new ImageElement(
-                                                    JKook.getHttpAPI().uploadFile(file),
-                                                    null,
-                                                    Size.LG,
-                                                    false
-                                            ):null,
-                                                    file !=null ? Accessory.Mode.RIGHT : null))
-                                            .build();
-
-
-                                    reply(sender, message, card);
-
-
                                 }else {
-                                    reply(sender,message,"请先绑定Steam！");
+                                    SteamKook steamInfo = steamApiMapper.getSteamBdInfoByKookId(sender.getId());
+                                    if (null != steamInfo){
+                                        steamPerExtraction(sender,message,steamInfo.getSteamId());
+                                    }else {
+                                        reply(sender,message,"请先绑定Steam！");
+                                    }
                                 }
+
+
                             } else {
                                 log.info("This command is not available for console.");
                             }
@@ -218,6 +169,71 @@ public class SteamInstruction {
                 )
                 .register();
     }
+
+
+
+    private static void steamPerExtraction(User sender, Message message,String steamId) {
+        //personastate: 0隐身 | 离线，1在线，3离开
+        Api apiInfoById = steamApiMapper.getApiInfoById("6e24e9f01c0a4beeac02fd1e154df5f9");
+        String url = apiInfoById.getApiUrl() + "?key=" + apiInfoById.getAppKey() + "&steamids=" + steamId;
+        Map<String, Object> res = OkHttpClientUtil.get(url);
+        Map<String, Object> response = JSON.parseObject(res.get("response").toString(), Map.class);
+        Map<String,Object> players = JSON.parseObject(JSON.toJSONString(response.get("players")).replace("[", "").replace("]", ""), Map.class);
+
+        Api getLevelUrl = steamApiMapper.getApiInfoById("92141df427ea475796e8e276e7c856d6");
+        String levelUrl = getLevelUrl.getApiUrl() + "?key=" + getLevelUrl.getAppKey() + "&steamid=" + steamId;
+        Map<String, Object> levelRes = OkHttpClientUtil.get(levelUrl);
+        Map<String, Object> levelResponse = JSON.parseObject(levelRes.get("response").toString(), Map.class);
+
+
+        String statusCode = players.get("personastate").toString();
+        String status = "";
+        switch (statusCode) {
+            case "0":
+                status = "离线";
+                break;
+            case "1":
+                status = "在线";
+                break;
+            case "3":
+                status = "离开";
+                break;
+        }
+        String timecreatedDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(Long.parseLong(players.get("timecreated").toString()) * 1000));
+        String lastlogoffDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(Long.parseLong(players.get("lastlogoff").toString()) * 1000));
+
+        StringBuffer sb = new StringBuffer("用户名：" + players.get("personaname").toString() + "\n");
+        sb.append("等级：" + levelResponse.get("player_level") + "\n");
+        sb.append("状态：" + status + "\n");
+        if (players.containsKey("gameextrainfo")){
+            sb.append("正在玩：" + players.get("gameextrainfo") + "\n");
+        }
+        sb.append("最后登录时间：" + lastlogoffDate + "\n");
+        sb.append("账号创建时间：" + timecreatedDate);
+
+        File file = null;
+        try {
+            file = PictureUtils.UrlToFile(players.get("avatarfull").toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        MultipleCardComponent card = new CardBuilder()
+                .setTheme(Theme.NONE)
+                .setSize(Size.LG).addModule(new SectionModule(new MarkdownElement(sb.toString())
+                        ,file != null ? new ImageElement(
+                        JKook.getHttpAPI().uploadFile(file),
+                        null,
+                        Size.LG,
+                        false
+                ):null,
+                        file !=null ? Accessory.Mode.RIGHT : null))
+                .build();
+
+
+        reply(sender, message, card);
+    }
+
 
 
 }
