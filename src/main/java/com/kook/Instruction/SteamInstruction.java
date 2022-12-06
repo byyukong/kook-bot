@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.kook.mapper.SteamApiMapper;
 import com.kook.pojo.Api;
 import com.kook.pojo.SteamKook;
+import com.kook.pojo.steam.SteamGamesVo;
 import com.kook.pojo.steam.SteamResponseVo;
 import com.kook.util.MybatisUtils;
 import com.kook.util.OkHttpClientUtil;
@@ -103,6 +104,7 @@ public class SteamInstruction {
                                         }
                                         StringBuffer sb = new StringBuffer("游戏名：" + item.getName() + "\n");
                                         sb.append("最近两周游戏时间：" + playtime2weeks + "\n");
+                                        sb.append("最近两周每天平均游戏时间：" + Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytime2weeks()) / 60 / 24)) + "\n");
                                         sb.append("总时长：" + Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytimeForever()) / 60)) + "\n");
                                         sb.append("Windows游戏时间：" + Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytimeWindowsForever()) / 60)) + "\n");
                                         sb.append("MAC游戏时间：" + Double.parseDouble(String.format("%.2f",Double.parseDouble(item.getPlaytimeMacForever()) / 60)) + "\n");
@@ -180,6 +182,7 @@ public class SteamInstruction {
         log.info("查询个人信息：" + url);
 
         Map<String, Object> res = OkHttpClientUtil.get(url);
+//        log.error(JSON.toJSONString(res));
         Map<String, Object> response = JSON.parseObject(res.get("response").toString(), Map.class);
 
         Map<String,Object> players = JSON.parseObject(JSON.toJSONString(response.get("players")).replace("[", "").replace("]", ""), Map.class);
@@ -218,7 +221,13 @@ public class SteamInstruction {
             sb.append("最后登录时间：" + lastlogoffDate + "\n");
         }
 
-        sb.append("账号创建时间：" + timecreatedDate);
+        sb.append("账号创建时间：" + timecreatedDate + "\n");
+        if (players.containsKey("loccountrycode")){
+            String loccountrycode = players.get("loccountrycode").toString();
+            String lo = null == loccountrycode ? "未知" : loccountrycode;
+            sb.append("国家代码：" + lo);
+        }
+
 
         File file = null;
         try {
