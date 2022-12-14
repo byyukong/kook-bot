@@ -223,9 +223,9 @@ public class SteamInstruction {
 
         sb.append("账号创建时间：" + timecreatedDate + "\n");
         if (players.containsKey("loccountrycode")){
-            String loccountrycode = players.get("loccountrycode").toString();
-            String lo = null == loccountrycode ? "未知" : loccountrycode;
-            sb.append("国家代码：" + lo);
+            sb.append("国家代码：" + players.get("loccountrycode").toString());
+        }else {
+            sb.append("国家代码：未知");
         }
 
 
