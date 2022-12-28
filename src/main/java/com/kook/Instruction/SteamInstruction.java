@@ -202,6 +202,9 @@ public class SteamInstruction {
             case "1":
                 status = "在线";
                 break;
+            case "2":
+                status = "忙碌";
+                break;
             case "3":
                 status = "离开";
                 break;
