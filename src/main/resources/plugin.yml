@@ -1,5 +1,5 @@
-name: ExampleBot
+name: BQB-BOT
 version: 0.1.0
-api-version: 0.37.3
+api-version: 0.37.5
 authors: ["SNWCreations"]
 main: com.kook.Main
