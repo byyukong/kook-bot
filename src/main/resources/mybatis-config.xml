@@ -13,7 +13,7 @@
             <transactionManager type="JDBC"/>
             <dataSource type="POOLED">
                 <property name="driver" value="com.mysql.jdbc.Driver"/>
-                <property name="url" value="jdbc:mysql://localhost:3306/kook-bot?characterEncoding=utf-8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/kook-bot?characterEncoding=utf-8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true&amp;autoReconnect=true&amp;failOverReadOnly=false"/>
                 <property name="username" value="root"/>
                 <property name="password" value="1157436060"/>
             </dataSource>
