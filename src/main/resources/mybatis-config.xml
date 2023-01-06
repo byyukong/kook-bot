@@ -11,11 +11,21 @@
     <environments default="development">
         <environment id="development">
             <transactionManager type="JDBC"/>
-            <dataSource type="POOLED">
+            <!--<dataSource type="POOLED">
                 <property name="driver" value="com.mysql.jdbc.Driver"/>
-                <property name="url" value="jdbc:mysql://localhost:3306/kook-bot?characterEncoding=utf-8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true&amp;autoReconnect=true&amp;failOverReadOnly=false"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/kook-bot?characterEncoding=utf-8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true&amp;failOverReadOnly=false"/>
                 <property name="username" value="root"/>
                 <property name="password" value="1157436060"/>
+            </dataSource>-->
+            <dataSource type="com.kook.util.MyDruidDataSourceFactory">
+                <property name="driver" value="com.mysql.cj.jdbc.Driver" />
+                <property name="url" value="jdbc:mysql://localhost:3306/kook-bot?characterEncoding=utf-8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true&amp;failOverReadOnly=false" />
+                <property name="username" value="root" />
+                <property name="password" value="1157436060" />
+                <property name="maxActive" value="30" />
+                <property name="initialSize" value="30" />
+                <property name="minIdle" value="30" />
+                <property name="testWhileIdle" value="false" />
             </dataSource>
         </environment>
     </environments>
