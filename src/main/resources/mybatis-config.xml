@@ -22,10 +22,12 @@
                 <property name="url" value="jdbc:mysql://localhost:3306/kook-bot?characterEncoding=utf-8&amp;useSSL=false&amp;allowPublicKeyRetrieval=true&amp;failOverReadOnly=false" />
                 <property name="username" value="root" />
                 <property name="password" value="1157436060" />
-                <property name="maxActive" value="30" />
-                <property name="initialSize" value="30" />
-                <property name="minIdle" value="30" />
-                <property name="testWhileIdle" value="false" />
+                <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+                <property name="minEvictableIdleTimeMillis" value="60000" />
+                <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+                <property name="timeBetweenEvictionRunsMillis" value="5000" />
+                <!-- 校验SQL，不配置的话，testWhileIdle、testOnBorrow、testOnReturn无效 -->
+                <property name="validationQuery" value="select 'x'" />
             </dataSource>
         </environment>
     </environments>

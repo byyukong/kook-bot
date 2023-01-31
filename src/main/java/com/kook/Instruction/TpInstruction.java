@@ -20,11 +20,16 @@ public class TpInstruction {
                 .executesUser(
                         (sender, args, message) -> {
                             if (sender instanceof User) {
+                                String msg = "笨逼！";
+                                if (args.length > 0) {
+                                    msg = args[0];
+                                }
+
                                 MultipleCardComponent card = new CardBuilder()
                                         .setTheme(Theme.NONE)
                                         .setSize(Size.LG)
                                         .addModule(
-                                                new HeaderModule(new PlainTextElement("笨逼！", false))
+                                                new HeaderModule(new PlainTextElement(msg, false))
                                         )
                                         .build();
                                 reply(sender, message, card);
