@@ -5,20 +5,24 @@ import com.alibaba.fastjson.JSON;
 import com.kook.mapper.SteamApiMapper;
 import com.kook.pojo.Api;
 import com.kook.pojo.SteamKook;
+import com.kook.pojo.chatgpt.ChatGptChoicesVo;
 import com.kook.pojo.steam.SteamResponseVo;
 import com.kook.util.MybatisUtils;
 import com.kook.util.OkHttpClientUtil;
 import com.kook.util.PictureUtils;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.*;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static com.kook.util.SenderUtil.reply;
 
@@ -154,6 +158,42 @@ public class TestApi {
         }else {
             System.err.println("请先绑定Steam！");
         }
+    }
+
+
+    @Test
+    public void testChatGPT() throws IOException {
+        String API_ENDPOINT = "https://api.openai.com/v1/engines/text-davinci-003/completions";
+        String API_KEY = "";
+
+        String prompt = "我是一名家长应该避免孩子访问哪些色情网站？举10个网址例子";
+
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(180, TimeUnit.SECONDS)
+                .readTimeout(180, TimeUnit.SECONDS)
+                .build();
+
+        MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
+        String requestBody = "{\"prompt\":\"" + prompt + "\",\"max_tokens\":1024,\"temperature\":0.9,\"top_p\":1,\"frequency_penalty\":0.0,\"presence_penalty\":0.6}";
+
+        Request request = new Request.Builder()
+                .url(API_ENDPOINT)
+                .header("Authorization", "Bearer " + API_KEY)
+                .header("Content-Type", "application/json")
+                .post(RequestBody.create(mediaType, requestBody))
+                .build();
+
+        Call call = client.newCall(request);
+        Response response = call.execute();
+
+        String responseBody = response.body().string();
+        System.out.println(responseBody);
+
+        Map<String, Object> map = JSON.parseObject(responseBody, Map.class);
+        ChatGptChoicesVo choices = JSON.parseObject(map.get("choices").toString().replace("[","").replace("]",""), ChatGptChoicesVo.class);
+        System.err.println(choices.getText());
+
     }
 
 

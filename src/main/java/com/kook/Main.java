@@ -93,6 +93,13 @@ public class Main extends BasePlugin {
          */
         EatInstruction.getEat();
 
+
+        /**
+         * /chat
+         * ChatGpt AI
+         */
+        ChatGptInstruction.getGhat();
+
         getLogger().info("PingBot 启动成功！");
     }
 
