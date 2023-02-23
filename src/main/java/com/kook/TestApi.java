@@ -191,7 +191,10 @@ public class TestApi {
         System.out.println(responseBody);
 
         Map<String, Object> map = JSON.parseObject(responseBody, Map.class);
-        ChatGptChoicesVo choices = JSON.parseObject(map.get("choices").toString().replace("[","").replace("]",""), ChatGptChoicesVo.class);
+
+        String substring = map.get("choices").toString().substring(1, map.get("choices").toString().length() - 1);
+
+        ChatGptChoicesVo choices = JSON.parseObject(substring, ChatGptChoicesVo.class);
         System.err.println(choices.getText());
 
     }

@@ -40,7 +40,11 @@ public class ChatGptInstruction {
                                     Api api = steamApiMapper.getApiInfoById("c027cccc406f4b6b9a6160cadde8d584");
                                     String API_ENDPOINT = api.getApiUrl();
                                     String API_KEY = api.getAppKey();
-                                    String prompt = args[0];
+                                    String prompt = "";
+
+                                    for (String str : args) {
+                                        prompt += str;
+                                    }
 
                                     OkHttpClient client = new OkHttpClient.Builder()
                                             .connectTimeout(180, TimeUnit.SECONDS)
@@ -71,7 +75,7 @@ public class ChatGptInstruction {
 
 
                                     Map<String, Object> map = JSON.parseObject(responseBody, Map.class);
-                                    ChatGptChoicesVo choices = JSON.parseObject(map.get("choices").toString().replace("[","").replace("]",""), ChatGptChoicesVo.class);
+                                    ChatGptChoicesVo choices = JSON.parseObject(map.get("choices").toString().substring(1, map.get("choices").toString().length() - 1), ChatGptChoicesVo.class);
 
                                     MultipleCardComponent card = new CardBuilder()
                                             .setTheme(Theme.NONE)
