@@ -36,7 +36,7 @@ public class ChatGptInstruction {
                 .executesUser(
                         (sender, args, message) -> {
                             if (sender instanceof User) {
-                                if (args.length == 1) {
+                                if (args.length > 0) {
                                     Api api = steamApiMapper.getApiInfoById("c027cccc406f4b6b9a6160cadde8d584");
                                     String API_ENDPOINT = api.getApiUrl();
                                     String API_KEY = api.getAppKey();
